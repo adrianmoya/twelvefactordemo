@@ -9,11 +9,11 @@
 	<artifactId>web</artifactId>
 
 	<dependencies>
-	<dependency>
-		<groupId>com.adrianmoya.12factor</groupId>
-		<artifactId>common</artifactId>
-		<version>${project.version}</version>
-	</dependency>	
+		<dependency>
+			<groupId>com.adrianmoya.12factor</groupId>
+			<artifactId>common</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 		<dependency>
 			<groupId>com.sparkjava</groupId>
 			<artifactId>spark-core</artifactId>
@@ -33,10 +33,6 @@
 		<dependency>
 			<groupId>com.sparkjava</groupId>
 			<artifactId>spark-debug-tools</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.rabbitmq</groupId>
-			<artifactId>amqp-client</artifactId>
 		</dependency>
 	</dependencies>
 

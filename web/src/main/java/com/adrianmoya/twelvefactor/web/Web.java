@@ -3,48 +3,30 @@ package com.adrianmoya.twelvefactor.web;
 import static spark.Spark.*;
 import static spark.debug.DebugScreen.enableDebugScreen;
 
-import java.io.IOException;
+import java.io.BufferedReader;
+import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.TimeoutException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.adrianmoya.twelvefactor.common.Configuration;
+import com.adrianmoya.twelvefactor.common.queue.QueueFactory;
+import com.adrianmoya.twelvefactor.common.queue.QueueService;
 import com.adrianmoya.twelvefactor.web.backingservices.RedisService;
-import com.rabbitmq.client.Channel;
-import com.rabbitmq.client.Connection;
-import com.rabbitmq.client.ConnectionFactory;
-
 import redis.clients.jedis.Jedis;
 import spark.ModelAndView;
 import spark.template.pebble.PebbleTemplateEngine;
 
 public class Web {
 
-	private final static Logger log = LoggerFactory.getLogger(Web.class); 
+	private final static Logger log = LoggerFactory.getLogger(Web.class);
+	private static final QueueService queue = QueueFactory.getQueue();
 	
 	public static void main(String[] args) {
 		port(Integer.parseInt(Configuration.get(Configuration.PORT)));
-		
-		ConnectionFactory factory = new ConnectionFactory();
-	    factory.setHost("localhost");
-	    Connection connection;
-		try {
-			connection = factory.newConnection();
-			Channel channel = connection.createChannel();
-			channel.queueDeclare("demo",false, false, false, null);
-			String message = "Hello World!";
-		    channel.basicPublish("", "demo", null, message.getBytes());
-		    log.info(" [x] Sent '" + message + "'");
-		    channel.close();
-		    connection.close();
-		} catch (Exception e){
 			
-		}
-			
-		get("/hello", (request, response) -> {
+		get("/", (req, res) -> {
 			Map<String, Object> attributes = new HashMap<>();
 			Jedis jedis = RedisService.pool.getResource();
 			jedis.set("foo", "bar");
@@ -53,6 +35,16 @@ public class Web {
 			
 			return new ModelAndView(attributes, "templates/index.html");
 		}, new PebbleTemplateEngine());
+		
+		post("/processmessages", (req, res) -> {
+			String messages = req.queryParams("messages");
+			BufferedReader rdr = new BufferedReader(new StringReader(messages));
+			for (String line = rdr.readLine(); line != null; line = rdr.readLine()) {
+				queue.sendMessage(line);			    
+			}
+			rdr.close();
+			return null;
+		});
 		
 		enableDebugScreen();
 	}
