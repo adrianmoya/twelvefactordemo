@@ -10,7 +10,23 @@
 <title>12 Factor App demo</title>
 </head>
 <body>
-	<p>Data in Redis session: {{ data }}.</p>
+	<p>App running at port {{ port }}</p>
+	
+	<div>
+		<p>Data in Session: {{ sessionValue }}</p>
+		<form action="/setsessionvalue" method="post">
+		<label>Set data on session: </label><input type="text" name="sessionValue">
+		<input type="submit" value="Submit">
+		</form>	
+	</div>
+
+	<div>
+		<p>Data in Redis: {{ redisValue }}</p>
+		<form action="/setredisvalue" method="post">
+		<label>Set data on redis: </label><input type="text" name="redisValue">
+		<input type="submit" value="Submit">
+		</form>	
+	</div>
 	
 	<div>
 	Send messages to process:

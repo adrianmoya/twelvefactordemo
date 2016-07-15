@@ -29,6 +29,7 @@ public class Worker {
 	    factory.setPort(rabbitConfig.getPort());
 	    Connection connection = factory.newConnection();
 	    Channel channel = connection.createChannel();
+		channel.basicQos(1);
 
 	    channel.queueDeclare(QUEUE_NAME, false, false, false, null);
 	    log.info(" [*] Waiting for messages. To exit press CTRL+C");

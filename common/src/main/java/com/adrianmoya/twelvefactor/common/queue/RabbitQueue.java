@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.adrianmoya.twelvefactor.common.Configuration;
+import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
@@ -43,9 +44,16 @@ public class RabbitQueue implements QueueService {
 	}
 
 	@Override
-	public boolean processMessage() {
-		// TODO Auto-generated method stub
-		return false;
+	public int messageCount() {
+		AMQP.Queue.DeclareOk dok;
+		try {
+			dok = channel.queueDeclare(QUEUE_NAME, false, false, false, null);
+			return dok.getMessageCount();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return 0;
+		}		
 	}
 
 }
